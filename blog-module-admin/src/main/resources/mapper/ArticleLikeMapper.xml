@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.ArticleLikeMapper">
+    
+    <!-- 获取用户点赞的文章列表 -->
+    <select id="selectUserLikedArticles" resultType="com.blog.model.entity.Article">
+        SELECT a.*
+        FROM article_like al
+        LEFT JOIN article a ON al.article_id = a.id
+        WHERE al.user_id = #{userId}
+        AND a.is_deleted = 0
+        ORDER BY al.create_time DESC
+    </select>
+    
+    <!-- 获取文章的点赞用户列表 -->
+    <select id="selectArticleLikedUsers" resultType="com.blog.model.entity.User">
+        SELECT u.*
+        FROM article_like al
+        LEFT JOIN user u ON al.user_id = u.id
+        WHERE al.article_id = #{articleId}
+        AND u.is_deleted = 0
+        ORDER BY al.create_time DESC
+    </select>
+</mapper> 
