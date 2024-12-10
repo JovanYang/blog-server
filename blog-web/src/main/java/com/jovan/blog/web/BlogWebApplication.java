@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @description:
  */
 @SpringBootApplication
-@ComponentScan({"com.jovan.blog"})
+@ComponentScan({"com.jovan.blog.*"})
 public class BlogWebApplication {
     public static void main(String[] args) {
         SpringApplication.run(BlogWebApplication.class, args);

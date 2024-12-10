@@ -33,11 +33,13 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     CATEGORY_NOT_FOUND(3001, "分类不存在"),
     CATEGORY_NAME_ALREADY_EXISTS(3002, "分类名称已存在");*/
 
-    //
-    SYSTEM_ERROR("10000", "系统内部异常,后台小哥正在努力修复中..."),
-    PARAMS_ERROR("20000", "请求参数错误"),
     // ----------- 通用异常状态码 -----------
+    SYSTEM_ERROR("10000", "系统内部异常,后台小哥正在努力修复中..."),
     PARAM_NOT_VALID("10001", "参数错误"),
+
+
+    USERNAME_OR_PWD_ERROR("20001", "用户名或密码错误"),
+    LOGIN_FAIL("20002", "登录失败")
     ;
     // 异常码
     private String errorCode;
