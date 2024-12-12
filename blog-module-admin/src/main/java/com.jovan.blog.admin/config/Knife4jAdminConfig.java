@@ -44,8 +44,8 @@ public class Knife4jAdminConfig {
         return new ApiInfoBuilder()
                 .title("Weblog 博客 Admin 后台接口文档") // 标题
                 .description("Weblog 是一款由 Spring Boot + Vue 3.2 + Vite 4.3 开发的前后端分离博客。") // 描述
-                .termsOfServiceUrl("https://www.quanxiaoha.com/") // API 服务条款
-                .contact(new Contact("犬小哈", "https://www.quanxiaoha.com", "871361652@qq.com")) // 联系人
+                .termsOfServiceUrl("https://www.jovanyang.com/") // API 服务条款
+                .contact(new Contact("Jovan", "https://www.jovanyang.com", "1902938476@qq.com")) // 联系人
                 .version("1.0") // 版本号
                 .build();
     }

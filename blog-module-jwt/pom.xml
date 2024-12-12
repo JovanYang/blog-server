@@ -59,16 +59,12 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
-        <!-- 通用模块 -->
-        <dependency>
-            <groupId>com.jovan</groupId>
-            <artifactId>blog-module-common</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
+
+        <!-- 通用模块 -->
         <dependency>
             <groupId>com.jovan</groupId>
             <artifactId>blog-module-common</artifactId>

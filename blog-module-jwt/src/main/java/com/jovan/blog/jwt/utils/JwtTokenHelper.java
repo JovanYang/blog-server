@@ -61,24 +61,6 @@ import java.util.Base64;
         }
 
         /**
-         * 生成 Token
-         * @param username
-         * @return
-         */
-        public String generateToken(String username) {
-            LocalDateTime now = LocalDateTime.now();
-            // Token 一个小时后失效
-            LocalDateTime expireTime = now.plusHours(1);
-
-            return Jwts.builder().setSubject(username)
-                    .setIssuer(issuer)
-                    .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
-                    .setExpiration(Date.from(expireTime.atZone(ZoneId.systemDefault()).toInstant()))
-                    .signWith(key)
-                    .compact();
-        }
-
-        /**
          * 解析 Token
          * @param token
          * @return
@@ -107,7 +89,53 @@ import java.util.Base64;
             return base64Key;
         }
 
-        public static void main(String[] args) {
+    /**
+     * 校验 Token 是否可用
+     * @param token
+     * @return
+     */
+    public void validateToken(String token) {
+        jwtParser.parseClaimsJws(token);
+    }
+
+    /**
+     * 解析 Token 获取用户名
+     * @param token
+     * @return
+     */
+    public String getUsernameByToken(String token) {
+        try {
+            Claims claims = jwtParser.parseClaimsJws(token).getBody();
+            String username = claims.getSubject();
+            return username;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Token 失效时间（分钟）
+     */
+    @Value("${jwt.tokenExpireTime}")
+    private Long tokenExpireTime;
+
+    public String generateToken(String username) {
+        LocalDateTime now = LocalDateTime.now();
+        // 设置 Token 失效时间
+        LocalDateTime expireTime = now.plusMinutes(tokenExpireTime);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuer(issuer)
+                .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(expireTime.atZone(ZoneId.systemDefault()).toInstant()))
+                .signWith(key)
+                .compact();
+    }
+
+
+    public static void main(String[] args) {
             String key = generateBase64Key();
             System.out.println("key: " + key);
         }
