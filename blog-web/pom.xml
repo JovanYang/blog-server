@@ -52,6 +52,24 @@
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
         </dependency>
+
+        <!-- 添加 jwt 模块依赖 -->
+        <dependency>
+            <groupId>com.jovan</groupId>
+            <artifactId>blog-module-jwt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jovan</groupId>
+            <artifactId>blog-module-admin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

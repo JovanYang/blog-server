@@ -17,82 +17,84 @@ import java.util.Base64;
 /**
  * @author: Jovan
  * @date: 2024/12/10
- * @description:
+ * @description: JWT Token 辅助类，用于生成、解析和验证 JWT Token
  */
+@Component
+public class JwtTokenHelper implements InitializingBean {
 
-    @Component
-    public class JwtTokenHelper implements InitializingBean {
+    /**
+     * 签发人
+     */
+    @Value("${jwt.issuer}")
+    private String issuer;
 
-        /**
-         * 签发人
-         */
-        @Value("${jwt.issuer}")
-        private String issuer;
-        /**
-         * 秘钥
-         */
-        private Key key;
+    /**
+     * 秘钥
+     */
+    private Key key;
 
-        /**
-         * JWT 解析
-         */
-        private JwtParser jwtParser;
+    /**
+     * JWT 解析器
+     */
+    private JwtParser jwtParser;
 
-        /**
-         * 解码配置文件中配置的 Base 64 编码 key 为秘钥
-         * @param base64Key
-         */
-        @Value("${jwt.secret}")
-        public void setBase64Key(String base64Key) {
-            key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
+    /**
+     * 解码配置文件中配置的 Base 64 编码 key 为秘钥
+     * @param base64Key Base64 编码的秘钥字符串
+     */
+    @Value("${jwt.secret}")
+    public void setBase64Key(String base64Key) {
+        key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
+    }
+
+    /**
+     * 初始化 JwtParser
+     * @throws Exception
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        // 考虑到不同服务器之间可能存在时钟偏移，setAllowedClockSkewSeconds 用于设置能够容忍的最大的时钟误差
+        jwtParser = Jwts.parserBuilder().requireIssuer(issuer)
+                .setSigningKey(key).setAllowedClockSkewSeconds(10)
+                .build();
+    }
+
+    /**
+     * 解析 Token
+     * @param token 待解析的 JWT Token
+     * @return 解析后的 Jws<Claims> 对象
+     * @throws BadCredentialsException 如果 Token 不可用
+     * @throws CredentialsExpiredException 如果 Token 失效
+     */
+    public Jws<Claims> parseToken(String token) {
+        try {
+            return jwtParser.parseClaimsJws(token);
+        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            throw new BadCredentialsException("Token 不可用", e);
+        } catch (ExpiredJwtException e) {
+            throw new CredentialsExpiredException("Token 失效", e);
         }
+    }
 
+    /**
+     * 生成一个 Base64 编码的安全秘钥
+     * @return 生成的 Base64 编码秘钥字符串
+     */
+    private static String generateBase64Key() {
+        // 生成安全秘钥
+        Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-        /**
-         * 初始化 JwtParser
-         * @throws Exception
-         */
-        @Override
-        public void afterPropertiesSet() throws Exception {
-            // 考虑到不同服务器之间可能存在时钟偏移，setAllowedClockSkewSeconds 用于设置能够容忍的最大的时钟误差
-            jwtParser = Jwts.parserBuilder().requireIssuer(issuer)
-                    .setSigningKey(key).setAllowedClockSkewSeconds(10)
-                    .build();
-        }
+        // 将密钥进行 Base64 编码
+        String base64Key = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-        /**
-         * 解析 Token
-         * @param token
-         * @return
-         */
-        public Jws<Claims> parseToken(String token) {
-            try {
-                return jwtParser.parseClaimsJws(token);
-            } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-                throw new BadCredentialsException("Token 不可用", e);
-            } catch (ExpiredJwtException e) {
-                throw new CredentialsExpiredException("Token 失效", e);
-            }
-        }
-
-        /**
-         * 生成一个 Base64 的安全秘钥
-         * @return
-         */
-        private static String generateBase64Key() {
-            // 生成安全秘钥
-            Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-
-            // 将密钥进行 Base64 编码
-            String base64Key = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-
-            return base64Key;
-        }
+        return base64Key;
+    }
 
     /**
      * 校验 Token 是否可用
-     * @param token
-     * @return
+     * @param token 待校验的 JWT Token
+     * @throws BadCredentialsException 如果 Token 不可用
+     * @throws CredentialsExpiredException 如果 Token 失效
      */
     public void validateToken(String token) {
         jwtParser.parseClaimsJws(token);
@@ -100,8 +102,8 @@ import java.util.Base64;
 
     /**
      * 解析 Token 获取用户名
-     * @param token
-     * @return
+     * @param token 待解析的 JWT Token
+     * @return 解析得到的用户名
      */
     public String getUsernameByToken(String token) {
         try {
@@ -120,6 +122,11 @@ import java.util.Base64;
     @Value("${jwt.tokenExpireTime}")
     private Long tokenExpireTime;
 
+    /**
+     * 生成 JWT Token
+     * @param username Token 的主体
+     * @return 生成的 JWT Token 字符串
+     */
     public String generateToken(String username) {
         LocalDateTime now = LocalDateTime.now();
         // 设置 Token 失效时间
@@ -134,10 +141,9 @@ import java.util.Base64;
                 .compact();
     }
 
-
     public static void main(String[] args) {
-            String key = generateBase64Key();
-            System.out.println("key: " + key);
-        }
+        String key = generateBase64Key();
+        System.out.println("key: " + key);
     }
+}
 

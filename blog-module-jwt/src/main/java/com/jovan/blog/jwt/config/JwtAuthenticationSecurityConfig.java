@@ -1,6 +1,6 @@
 package com.jovan.blog.jwt.config;
 
-import com.jovan.blog.jwt.fliter.JwtAuthenticationFilter;
+import com.jovan.blog.jwt.fliter.JwtAuthenticationLoginFilter;
 import com.jovan.blog.jwt.handler.RestAuthenticationFailureHandler;
 import com.jovan.blog.jwt.handler.RestAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.annotation.Resource;
+
 /**
  * @author: Jovan
  * @date: 2024/12/10
@@ -22,22 +24,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-    @Autowired
+    @Resource
     private RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
 
-    @Autowired
+    @Resource
     private RestAuthenticationFailureHandler restAuthenticationFailureHandler;
 
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
+    @Resource
     private UserDetailsService userDetailsService;
 
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
         // 自定义的用于 JWT 身份验证的过滤器
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        JwtAuthenticationLoginFilter filter = new JwtAuthenticationLoginFilter();
         filter.setAuthenticationManager(httpSecurity.getSharedObject(AuthenticationManager.class));
 
         // 设置登录认证对应的处理类（成功处理、失败处理）
